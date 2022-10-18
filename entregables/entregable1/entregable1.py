@@ -3,10 +3,12 @@ import sys
 from random import shuffle, seed
 from typing import TextIO, Optional
 
-from algoritmia.datastructures.graphs import UndirectedGraph
+from algoritmia.algorithms.traversers import bf_vertex_traverser
+from algoritmia.datastructures.graphs import UndirectedGraph, IGraph
 from algoritmia.datastructures.mergefindsets import MergeFindSet
 
-from algoritmia.algorithms.shortest_path import shortest_path_unweighted_graph
+from algoritmia.algorithms.shortest_path import shortest_path_unweighted_graph, Path, path_recover
+from algoritmia.datastructures.queues import Fifo
 
 Vertex = tuple[int, int]
 Edge = tuple[Vertex, Vertex]
@@ -45,7 +47,31 @@ def read_data(f: TextIO) -> tuple[UndirectedGraph[Vertex], int, int]:
     return graph, rows, cols
 
 
+def precalculateDistanceBetter(g: IGraph[Vertex], v_initial: Vertex, dictresults: dict[Vertex, int]):
+    profundidad = 0
+    # edge traverse
+    queue = Fifo()
+    seen = set()
+    queue.push((v_initial, v_initial))
+    seen.add(v_initial)
+    while len(queue) > 0:
+        level_size = len(queue)
+        while (level_size != 0):
+
+            level_size -= 1
+            u, v = queue.pop()
+            # guardamos profundidad de cad nodo
+            dictresults[v] = profundidad
+
+            for suc in g.succs(v):
+                if suc not in seen:
+                    queue.push((v, suc))
+                    seen.add(suc)
+        profundidad += 1
+
+
 def precalculardist(lab: UndirectedGraph[Vertex], inicio: Vertex, dictresults: dict[Vertex, int]):
+
     for v in lab.V:
         distancia = len(shortest_path_unweighted_graph(lab, inicio, v))
         dictresults[v] = distancia
@@ -56,8 +82,7 @@ def precalculardist(lab: UndirectedGraph[Vertex], inicio: Vertex, dictresults: d
 def process(lab: UndirectedGraph[Vertex], rows: int, cols: int) -> tuple[Optional[Edge], int, int]:
     v_source = (0,0)
     v_dest = (rows - 1, cols - 1)
-    length_before = len(shortest_path_unweighted_graph(lab, v_source, v_dest))
-    length_after = length_before
+
 
 
     dictInit2Cell: dict[Vertex, int] = {}  # diccionario que guarda las distancias desde el inicio a cada posible coordenada del grafo
@@ -66,15 +91,18 @@ def process(lab: UndirectedGraph[Vertex], rows: int, cols: int) -> tuple[Optiona
     wallToDelete = ((999999,999999),(999999,999999))
 
 
-    # precalcular de 0 a todas las celdas
+    # precalcular de 0 a todas las celdas n
 
-    precalculardist(lab, v_source, dictInit2Cell)
+    precalculateDistanceBetter(lab, v_source, dictInit2Cell)
 
-    # precalcular de todas las celdas a la  salida
+    # precalcular de todas las celdas a la  salida n
 
-    precalculardist(lab, v_dest, dictCell2End)
+    precalculateDistanceBetter(lab, v_dest, dictCell2End)
 
-    # recorremos TODAS las aristas y si no estan en el laberinto y son mas corta (el camino por ahí es mas corto) que la actual guardamos la pared
+    length_before = dictInit2Cell[v_dest]
+    length_after = length_before
+
+    # recorremos TODAS las aristas y si no estan en el laberinto y son mas corta (el camino por ahí es mas corto) que la actual guardamos la pared n
     for r, c in lab.V:
 
         if r == 0 and c == 0:
@@ -84,11 +112,10 @@ def process(lab: UndirectedGraph[Vertex], rows: int, cols: int) -> tuple[Optiona
             if a[0] > a[1]:
                 a = (a[1], a[0])
 
-            if a not in lab.E:
-                coste = min(dictInit2Cell[a[0]] + dictCell2End[a[1]], dictCell2End[a[0]] + dictInit2Cell[a[1]])
-                if coste < length_after or (coste == length_after and a < wallToDelete):
-                    length_after = coste
-                    wallToDelete = a
+            coste = min(dictInit2Cell[a[0]] + dictCell2End[a[1]], dictCell2End[a[0]] + dictInit2Cell[a[1]])
+            if coste < length_after or (coste == length_after and a < wallToDelete):
+                length_after = coste
+                wallToDelete = a
 
         elif c == 0:
             a: Edge = ((r, c), (r - 1, c))
@@ -96,11 +123,11 @@ def process(lab: UndirectedGraph[Vertex], rows: int, cols: int) -> tuple[Optiona
                 a = (a[1], a[0])
 
 
-            if a not in lab.E:
-                coste = min(dictInit2Cell[a[0]] + dictCell2End[a[1]], dictCell2End[a[0]] + dictInit2Cell[a[1]])
-                if coste < length_after or (coste == length_after and a < wallToDelete):
-                    length_after = coste
-                    wallToDelete = a
+
+            coste = min(dictInit2Cell[a[0]] + dictCell2End[a[1]], dictCell2End[a[0]] + dictInit2Cell[a[1]])
+            if coste < length_after or (coste == length_after and a < wallToDelete):
+                length_after = coste
+                wallToDelete = a
         else:
             a1: Edge = ((r, c), (r, c - 1))
             if a1[0] > a1[1]:
@@ -110,22 +137,22 @@ def process(lab: UndirectedGraph[Vertex], rows: int, cols: int) -> tuple[Optiona
             if a2[0] > a2[1]:
                 a2 = (a2[1], a2[0])
 
-            if a1 not in lab.E:
-                coste = min(dictInit2Cell[a1[0]] + dictCell2End[a1[1]], dictCell2End[a1[0]] + dictInit2Cell[a1[1]])
-                if coste < length_after or (coste == length_after and a1 < wallToDelete):
-                    length_after = coste
-                    wallToDelete = a1
 
-            if a2 not in lab.E:
-                coste = min(dictInit2Cell[a2[0]] + dictCell2End[a2[1]], dictCell2End[a2[0]] + dictInit2Cell[a2[1]])
-                if coste < length_after or (coste == length_after and a2 < wallToDelete):
-                    length_after = coste
-                    wallToDelete = a2
+            coste = min(dictInit2Cell[a1[0]] + dictCell2End[a1[1]], dictCell2End[a1[0]] + dictInit2Cell[a1[1]])
+            if coste < length_after or (coste == length_after and a1 < wallToDelete):
+                length_after = coste
+                wallToDelete = a1
 
-    if wallToDelete == ((999999,999999),(999999,999999)):
+
+            coste = min(dictInit2Cell[a2[0]] + dictCell2End[a2[1]], dictCell2End[a2[0]] + dictInit2Cell[a2[1]])
+            if coste < length_after or (coste == length_after and a2 < wallToDelete):
+                length_after = coste
+                wallToDelete = a2
+
+    if wallToDelete in lab.E:
         wallToDelete = None
 
-    return wallToDelete, length_before - 1, length_after - 1
+    return wallToDelete, length_before, length_after + 1
 
 
 def show_results(edge_to_add: Optional[Edge], length_before: int, length_after: int):
