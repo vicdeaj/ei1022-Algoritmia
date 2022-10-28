@@ -28,7 +28,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     lista_tam = []
     for i in range(len(leaflet_list)):
         folleto = leaflet_list[i]
-        lista_tam.append(folleto[1])
+        lista_tam.append(folleto[1] * folleto[2])
     indices = range(len(lista_tam))
 
     #Ordenamos de mayor a menor el tamaño de los folletos
@@ -54,7 +54,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                 y = hueco[2] + folleto[2]
                 if  x != hueco[1] and y != hueco[3]:
                     huecos.remove(hueco)
-                    if (hueco[1] - x) >= (hueco[1] - hueco[0]):
+                    if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
                         huecos.append([x, hueco[1], hueco[2], y])
                         huecos.append([hueco[0], hueco[1], y, hueco[3]])
                         break
@@ -71,8 +71,12 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
             resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
             x = hueco[0] + folleto[1]
             y = hueco[2] + folleto[2]
-            dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
-            dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
+            if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
+                dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
+                dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
+            else:
+                dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
+                dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
 
     return resultado
 
