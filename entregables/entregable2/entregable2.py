@@ -28,7 +28,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     lista_tam = []
     for i in range(len(leaflet_list)):
         folleto = leaflet_list[i]
-        lista_tam.append(folleto[1] * folleto[2])
+        lista_tam.append(folleto[1])
     indices = range(len(lista_tam))
 
     #Ordenamos de mayor a menor el tamaño de los folletos
@@ -44,26 +44,26 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
         #print(dict_hojas)
         for hoja in range(1, len(dict_hojas)+1):
             huecos = dict_hojas.get(hoja)
-            for hueco in huecos:
-                anchura = hueco[1] - hueco[0]
-                altura = hueco[3] - hueco[2]
-                if anchura >= folleto[1] and altura >= folleto[2]:
-                    encajado = True
-                    resultado.append((folleto[0], hoja, hueco[0], hueco[2]))
-                    x = hueco[0] + folleto[1]
-                    y = hueco[2] + folleto[2]
-
-                    if  x != hueco[1] and y != hueco[3]:
-                        huecos.remove(hueco)
+            hueco = huecos[0]
+            anchura = hueco[1] - hueco[0]
+            altura = hueco[3] - hueco[2]
+            if anchura >= folleto[1] and altura >= folleto[2]:
+                encajado = True
+                resultado.append((folleto[0], hoja, hueco[0], hueco[2]))
+                x = hueco[0] + folleto[1]
+                y = hueco[2] + folleto[2]
+                if  x != hueco[1] and y != hueco[3]:
+                    huecos.remove(hueco)
+                    if (hueco[1] - x) >= (hueco[1] - hueco[0]):
                         huecos.append([x, hueco[1], hueco[2], y])
                         huecos.append([hueco[0], hueco[1], y, hueco[3]])
                         break
-                    if x == hueco[1]:
-                        hueco[2] = y
-                        break
-                    hueco[0] = x
+                    huecos.append([hueco[0], hueco[1], y, hueco[3]])
+                    huecos.append([x, hueco[1], hueco[2], y])
+                if x == hueco[1]:
+                    hueco[2] = y
                     break
-            if encajado:
+                hueco[0] = x
                 break
         if not encajado:
             hueco = [0, paper_size, 0, paper_size]
