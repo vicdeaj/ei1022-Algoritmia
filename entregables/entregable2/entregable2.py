@@ -25,11 +25,11 @@ def read_data(f: TextIO) -> tuple[int, list[Leaflet]]:
 # Devuelve tamaño del papel y lista de folletos
 def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     #Creamos lista de tamaños de los folletos
-    lista_tam: list[int] = [-1] * len(leaflet_list)
-    indices = range(len(leaflet_list))
+    lista_tam = []
     for i in range(len(leaflet_list)):
         folleto = leaflet_list[i]
-        lista_tam[i] = folleto[1] * folleto[2]
+        lista_tam.append(folleto[1] * folleto[2])
+    indices = range(len(lista_tam))
 
     #Ordenamos de mayor a menor el tamaño de los folletos
     sorted_indices = sorted(indices, key=lambda i: -lista_tam[i])
@@ -39,17 +39,20 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     dict_hojas: dict[int, huecos] = {1:[[0, paper_size, 0, paper_size]]}
     for i in sorted_indices:
         folleto: Leaflet = leaflet_list[i]
+        #print(folleto)
         encajado = False
-        for hoja in range(1, len(dict_hojas)):
-            huecos = dict_hojas[hoja]
+        #print(dict_hojas)
+        for hoja in range(1, len(dict_hojas)+1):
+            huecos = dict_hojas.get(hoja)
             for hueco in huecos:
                 anchura = hueco[1] - hueco[0]
                 altura = hueco[3] - hueco[2]
-                if anchura >= folleto[0] and altura >= folleto[1]:
+                if anchura >= folleto[1] and altura >= folleto[2]:
                     encajado = True
                     resultado.append((folleto[0], hoja, hueco[0], hueco[2]))
-                    x = hueco[0] + folleto[0]
-                    y = hueco[2] + folleto[1]
+                    x = hueco[0] + folleto[1]
+                    y = hueco[2] + folleto[2]
+
                     if  x != hueco[1] and y != hueco[3]:
                         huecos.remove(hueco)
                         huecos.append([x, hueco[1], hueco[2], y])
@@ -60,12 +63,14 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                         break
                     hueco[0] = x
                     break
+            if encajado:
+                break
         if not encajado:
             hueco = [0, paper_size, 0, paper_size]
             dict_hojas[len(dict_hojas) + 1] = []
-            resultado.append((folleto[0], len(dict_hojas) +1, hueco[0], hueco[2]))
-            x = hueco[0] + folleto[0]
-            y = hueco[2] + folleto[1]
+            resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
+            x = hueco[0] + folleto[1]
+            y = hueco[2] + folleto[2]
             dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
             dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
 
