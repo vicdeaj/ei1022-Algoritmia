@@ -35,16 +35,15 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     sorted_indices = sorted(indices, key=lambda i: -lista_tam[i])
 
     resultado: list[LeafletPos] = []
-    huecos = list[list[int, int, int, int]]
-    dict_hojas: dict[int, huecos] = {1:[[0, paper_size, 0, paper_size]]}
+    hueco = list[int, int, int, int]
+    dict_hojas: dict[int, hueco] = {1:[0, paper_size, 0, paper_size]}
     for i in sorted_indices:
         folleto: Leaflet = leaflet_list[i]
         #print(folleto)
         encajado = False
         #print(dict_hojas)
         for hoja in range(1, len(dict_hojas)+1):
-            huecos = dict_hojas.get(hoja)
-            hueco = huecos[0]
+            hueco = dict_hojas[hoja]
             anchura = hueco[1] - hueco[0]
             altura = hueco[3] - hueco[2]
             if anchura >= folleto[1] and altura >= folleto[2]:
@@ -53,13 +52,10 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                 x = hueco[0] + folleto[1]
                 y = hueco[2] + folleto[2]
                 if  x != hueco[1] and y != hueco[3]:
-                    huecos.remove(hueco)
                     if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
-                        huecos.append([x, hueco[1], hueco[2], y])
-                        huecos.append([hueco[0], hueco[1], y, hueco[3]])
+                        dict_hojas[hoja] = [x, hueco[1], hueco[2], y]
                         break
-                    huecos.append([hueco[0], hueco[1], y, hueco[3]])
-                    huecos.append([x, hueco[1], hueco[2], y])
+                    dict_hojas[hoja]= [hueco[0], hueco[1], y, hueco[3]]
                 if x == hueco[1]:
                     hueco[2] = y
                     break
@@ -67,16 +63,15 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                 break
         if not encajado:
             hueco = [0, paper_size, 0, paper_size]
-            dict_hojas[len(dict_hojas) + 1] = []
+            dict_hojas[len(dict_hojas) + 1] = hueco
+
             resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
             x = hueco[0] + folleto[1]
             y = hueco[2] + folleto[2]
             if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
-                dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
-                dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
+                dict_hojas[len(dict_hojas)] = [x, hueco[1], hueco[2], y]
             else:
-                dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
-                dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
+                dict_hojas[len(dict_hojas)] = [hueco[0], hueco[1], y, hueco[3]]
 
     return resultado
 
