@@ -39,13 +39,14 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     hueco = list[int, int, int, int] #x0 #x1 #y0 #y1
     #dict_hojas: dict[int, hueco] = {1:[0, paper_size, 0, paper_size]}
     dict_hojas: list[hueco] = [[0, paper_size, 0, paper_size]]
+    sorted_indices_hojas: list[int] = [0]
 
     for i in sorted_indices:
         folleto: Leaflet = leaflet_list[i]
         #print(folleto)
         encajado = False
         #print(dict_hojas)
-        for hoja in range(len(dict_hojas)):
+        for hoja in sorted_indices_hojas:
             hueco = dict_hojas[hoja]
             anchura = hueco[1] - hueco[0]
             altura = hueco[3] - hueco[2]
@@ -60,6 +61,8 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                         break
                     else:
                         dict_hojas[hoja]= [hueco[0], hueco[1], y, hueco[3]]
+                    #sorted_indices_hojas.sort(key=lambda i:  (dict_hojas[i][1] - dict_hojas[i][0]) *  (dict_hojas[i][3] - dict_hojas[i][2]))
+
                 if x == hueco[1]:
                     hueco[2] = y
                     break
@@ -68,6 +71,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
         if not encajado:
             hueco = [0, paper_size, 0, paper_size]
             dict_hojas.append(hueco)
+            sorted_indices_hojas.insert(0,len(dict_hojas)-1)
 
             resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
             x = hueco[0] + folleto[1]
