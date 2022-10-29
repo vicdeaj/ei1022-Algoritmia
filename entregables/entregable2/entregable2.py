@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from typing import TextIO
+from algoritmia.datastructures.priorityqueues import MinHeap
 
 # Folleto en inglés es Leaflet
 Leaflet = tuple[int, int, int]          # (num_folleto, anchura, altura)
@@ -36,6 +37,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
 
     resultado: list[LeafletPos] = []
     hueco = list[int, int, int, int]
+    cola: MinHeap = MinHeap()
     dict_hojas: dict[int, hueco] = {1:[0, paper_size, 0, paper_size]}
     for i in sorted_indices:
         folleto: Leaflet = leaflet_list[i]
@@ -52,7 +54,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                 x = hueco[0] + folleto[1]
                 y = hueco[2] + folleto[2]
                 if  x != hueco[1] and y != hueco[3]:
-                    if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
+                    if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3] - y):
                         dict_hojas[hoja] = [x, hueco[1], hueco[2], y]
                         break
                     dict_hojas[hoja]= [hueco[0], hueco[1], y, hueco[3]]
@@ -68,7 +70,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
             resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
             x = hueco[0] + folleto[1]
             y = hueco[2] + folleto[2]
-            if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3]- hueco[1]):
+            if (hueco[1] - x)*(y-hueco[2]) >= (hueco[1] - hueco[0])*(hueco[3] - y):
                 dict_hojas[len(dict_hojas)] = [x, hueco[1], hueco[2], y]
             else:
                 dict_hojas[len(dict_hojas)] = [hueco[0], hueco[1], y, hueco[3]]
