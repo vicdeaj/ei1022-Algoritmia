@@ -57,6 +57,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
                         huecos.remove(hueco)
                         huecos.append([x, hueco[1], hueco[2], y])
                         huecos.append([hueco[0], hueco[1], y, hueco[3]])
+                        huecos.sort(key=lambda i: -(i[1]- i[0]) * (i[3]-i[2]))
                         break
                     if x == hueco[1]:
                         hueco[2] = y
@@ -73,6 +74,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
             y = hueco[2] + folleto[2]
             dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
             dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
+            dict_hojas[len(dict_hojas)].sort(key=lambda i: -(i[1]- i[0]) * (i[3]-i[2]))
 
     return resultado
 
