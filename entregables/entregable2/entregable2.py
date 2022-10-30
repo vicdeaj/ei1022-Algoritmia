@@ -70,7 +70,8 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
         if not encajado: #si el hueco no es suficientemente grande creamos una nueva hoja hoja con un hueco con superficie total de la hoja
             hueco = [0, paper_size, 0, paper_size]
             list_hojas.append(hueco)
-            sorted_indices_hojas.insert(0,len(list_hojas)-1) #para optimizar tiempo añadimos la hoja al principio de la lista de hojas
+            sorted_indices_hojas.append(len(list_hojas) -1)
+            #sorted_indices_hojas.insert(0,len(list_hojas)-1) #para optimizar tiempo añadimos la hoja al principio de la lista de hojas
             anyadir_folleto(hueco, list_hojas, len(list_hojas) - 1, resultado, folleto)
 
     return resultado
