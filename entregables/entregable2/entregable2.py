@@ -29,10 +29,10 @@ def anyadir_folleto(hueco: Hueco, list_hojas: list[Hueco], hoja: int, resultado:
     x = hueco[0] + folleto[1]
     y = hueco[2] + folleto[2]
     if x != hueco[1] and y != hueco[3]:  # si sobra hueco en el eje x o y del hueco despues de haber insertado el folleto
-        if (hueco[1] - x) * (y - hueco[2]) > (hueco[1] - hueco[0]) * (hueco[3] - y):  # se divide la superficie sobrante en 2 rectangulos y solo se añade el mas grande de ellos
-            list_hojas[hoja] = [x, hueco[1], hueco[2], y]
+        if (hueco[1] - x) * (hueco[3] - hueco[2]) > (x - hueco[0]) * (hueco[3] - y):  # se divide la superficie sobrante verticalmente en 2 rectangulos y solo se añade el mas grande de ellos
+            list_hojas[hoja] = [x, hueco[1], hueco[2], hueco[3]]
         else:
-            list_hojas[hoja] = [hueco[0], hueco[1], y, hueco[3]]
+            list_hojas[hoja] = [hueco[0], x, y, hueco[3]]
     else:
         if x == hueco[1]:  # si no sobra hueco en x o en x e y
             hueco[2] = y
@@ -44,10 +44,10 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     lista_tam = []
     for i in range(len(leaflet_list)):
         folleto = leaflet_list[i]
-        lista_tam.append(folleto[1] * folleto[2])
+        lista_tam.append(folleto[1])
     indices = range(len(lista_tam))
 
-    #Ordenamos de mayor a menor el tamaño de los folletos
+    #Ordenamos de mayor a menor los folletos por anchura
     sorted_indices = sorted(indices, key=lambda i: -lista_tam[i])
 
     resultado: list[LeafletPos] = []
@@ -70,8 +70,7 @@ def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
         if not encajado: #si el hueco no es suficientemente grande creamos una nueva hoja hoja con un hueco con superficie total de la hoja
             hueco = [0, paper_size, 0, paper_size]
             list_hojas.append(hueco)
-            sorted_indices_hojas.append(len(list_hojas) -1)
-            #sorted_indices_hojas.insert(0,len(list_hojas)-1) #para optimizar tiempo añadimos la hoja al principio de la lista de hojas
+            sorted_indices_hojas.insert(0,len(list_hojas)-1) #para optimizar tiempo añadimos la hoja al principio de la lista de hojas
             anyadir_folleto(hueco, list_hojas, len(list_hojas) - 1, resultado, folleto)
 
     return resultado
