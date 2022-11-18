@@ -48,10 +48,10 @@ def process(board: Board) -> Optional[Solution]:
                                         self.extra)  # no metemos objeto en mochila, lo metemos despues, asi llega antes a los 1 y por lo tanto añade mas elementos
 
         def solution(self):
-            return self.extra.current_value, self.extra.current_weight, self.decisions()
+            return self.extra.camino
 
         def state(self):  # cuando dos nodos tienen el mismo futuro (repesentan el mismo problema)
-            return len(self), self.extra.current_weight
+            return self.extra.brick
 
         def score(self):
             return self.extra.current_value
