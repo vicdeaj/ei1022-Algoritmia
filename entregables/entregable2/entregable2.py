@@ -5,7 +5,7 @@ from typing import TextIO
 # Folleto en inglés es Leaflet
 Leaflet = tuple[int, int, int]          # (num_folleto, anchura, altura)
 LeafletPos = tuple[int, int, int, int]  # (num_folleto, num_hoja_de_imprenta, pos_x ,pos_y)
-
+Hueco = list[int, int, int, int]  # x0 #x1 #y0 #y1
 
 # Lee la instancia por la entrada estándar (ver apartado 1.1)
 # Devuelve el tamaño del papel de la imprenta y la lista de folletos
@@ -23,58 +23,55 @@ def read_data(f: TextIO) -> tuple[int, list[Leaflet]]:
 
 # Recibe el tamaño del papel de la imprenta y la lista de folletos
 # Devuelve tamaño del papel y lista de folletos
+
+def anyadir_folleto(hueco: Hueco, list_hojas: list[Hueco], hoja: int, resultado: list[LeafletPos], folleto: Leaflet):
+    resultado.append((folleto[0], hoja + 1, hueco[0], hueco[2]))
+    x = hueco[0] + folleto[1]
+    y = hueco[2] + folleto[2]
+    if x != hueco[1] and y != hueco[3]:  # si sobra hueco en el eje x o y del hueco despues de haber insertado el folleto
+        if (hueco[1] - x) * (hueco[3] - hueco[2]) > (x - hueco[0]) * (hueco[3] - y):  # se divide la superficie sobrante verticalmente en 2 rectangulos y solo se añade el mas grande de ellos
+            list_hojas[hoja] = [x, hueco[1], hueco[2], hueco[3]]
+        else:
+            list_hojas[hoja] = [hueco[0], x, y, hueco[3]]
+    else:
+        if x == hueco[1]:  # si no sobra hueco en x o en x e y
+            hueco[2] = y
+        else:
+            hueco[0] = x  # si no sobra solo en y
+
 def process(paper_size: int, leaflet_list: list[Leaflet]) -> list[LeafletPos]:
     #Creamos lista de tamaños de los folletos
     lista_tam = []
     for i in range(len(leaflet_list)):
         folleto = leaflet_list[i]
-        lista_tam.append(folleto[1] * folleto[2])
+        lista_tam.append(folleto[1])
     indices = range(len(lista_tam))
 
-    #Ordenamos de mayor a menor el tamaño de los folletos
+    #Ordenamos de mayor a menor los folletos por anchura
     sorted_indices = sorted(indices, key=lambda i: -lista_tam[i])
 
     resultado: list[LeafletPos] = []
-    huecos = list[list[int, int, int, int]]
-    dict_hojas: dict[int, huecos] = {1:[[0, paper_size, 0, paper_size]]}
+    list_hojas: list[Hueco] = [[0, paper_size, 0, paper_size]]
+    sorted_indices_hojas: list[int] = [0]
+
+    #Recorremos los folletos ordenados por superficie total
     for i in sorted_indices:
         folleto: Leaflet = leaflet_list[i]
-        #print(folleto)
         encajado = False
-        #print(dict_hojas)
-        for hoja in range(1, len(dict_hojas)+1):
-            huecos = dict_hojas.get(hoja)
-            for hueco in huecos:
-                anchura = hueco[1] - hueco[0]
-                altura = hueco[3] - hueco[2]
-                if anchura >= folleto[1] and altura >= folleto[2]:
-                    encajado = True
-                    resultado.append((folleto[0], hoja, hueco[0], hueco[2]))
-                    x = hueco[0] + folleto[1]
-                    y = hueco[2] + folleto[2]
-
-                    if  x != hueco[1] and y != hueco[3]:
-                        huecos.remove(hueco)
-                        huecos.append([x, hueco[1], hueco[2], y])
-                        huecos.append([hueco[0], hueco[1], y, hueco[3]])
-                        huecos.sort(key=lambda i: -(i[1]- i[0]) * (i[3]-i[2]))
-                        break
-                    if x == hueco[1]:
-                        hueco[2] = y
-                        break
-                    hueco[0] = x
-                    break
-            if encajado:
+        for hoja in sorted_indices_hojas:  #recorremos las hojas en busca de un hueco para el folleto
+            hueco = list_hojas[hoja]     #elegimos el hueco que hay en la hoja, ese hueco sera el hueco mas grande que la hoja tenia
+            anchura = hueco[1] - hueco[0]
+            altura = hueco[3] - hueco[2]
+            if anchura >= folleto[1] and altura >= folleto[2]:
+                encajado = True
+                anyadir_folleto(hueco, list_hojas, hoja, resultado, folleto)
                 break
-        if not encajado:
+
+        if not encajado: #si el hueco no es suficientemente grande creamos una nueva hoja hoja con un hueco con superficie total de la hoja
             hueco = [0, paper_size, 0, paper_size]
-            dict_hojas[len(dict_hojas) + 1] = []
-            resultado.append((folleto[0], len(dict_hojas), hueco[0], hueco[2]))
-            x = hueco[0] + folleto[1]
-            y = hueco[2] + folleto[2]
-            dict_hojas[len(dict_hojas)].append([x, hueco[1], hueco[2], y])
-            dict_hojas[len(dict_hojas)].append([hueco[0], hueco[1], y, hueco[3]])
-            dict_hojas[len(dict_hojas)].sort(key=lambda i: -(i[1]- i[0]) * (i[3]-i[2]))
+            list_hojas.append(hueco)
+            sorted_indices_hojas.insert(0,len(list_hojas)-1) #para optimizar tiempo añadimos la hoja al principio de la lista de hojas
+            anyadir_folleto(hueco, list_hojas, len(list_hojas) - 1, resultado, folleto)
 
     return resultado
 
