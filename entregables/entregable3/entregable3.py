@@ -31,21 +31,33 @@ def read_data(f: TextIO) -> Board:
 def process(board: Board) -> Optional[Solution]:
     @dataclass
     class Extra:
-        brick: Brick = Brick(board.start_pos(), board.start_pos())
+        brick: Brick
+        camino: Solution
 
     class KnapsackDS(ScoredDecisionSequence):
         def is_solution(self) -> bool:  # dice si estamos en una soludcion
-            return self.extra. == board.target_pos()
+            return self.extra.brick.b1 == board.target_pos() == self.extra.brick.b2
 
         def successors(self) -> Iterator[KnapsackDS]:  # añade las dos posibles decisiones
-            n = len(self)
-            if n < len(valorObjetos):
-                if self.extra.current_weight + pesoObjetos[n] <= capacidad:
-                    current_weight2 = self.extra.current_weight + pesoObjetos[n]
-                    current_value2 = self.extra.current_value + valorObjetos[n]
-                    yield self.add_decision(1, Extra(current_weight2, current_value2))
-                yield self.add_decision(0,
-                                        self.extra)  # no metemos objeto en mochila, lo metemos despues, asi llega antes a los 1 y por lo tanto añade mas elementos
+            newBrick: Brick = self.extra.brick.move(Direction.Right)
+            if board.has_tile(newBrick.b1) and board.has_tile(newBrick.b2):
+                caminoActual = self.extra.camino + tuple([Direction.Right])
+                yield self.add_decision(Direction.Right, Extra(newBrick, caminoActual))
+
+            newBrick: Brick = self.extra.brick.move(Direction.Up)
+            if board.has_tile(newBrick.b1) and board.has_tile(newBrick.b2):
+                caminoActual = self.extra.camino + tuple([Direction.Up])
+                yield self.add_decision(Direction.Up, Extra(newBrick, caminoActual))
+
+            newBrick: Brick = self.extra.brick.move(Direction.Down)
+            if board.has_tile(newBrick.b1) and board.has_tile(newBrick.b2):
+                caminoActual = self.extra.camino + tuple([Direction.Down])
+                yield self.add_decision(Direction.Down, Extra(newBrick, caminoActual))
+
+            newBrick: Brick = self.extra.brick.move(Direction.Left)
+            if board.has_tile(newBrick.b1) and board.has_tile(newBrick.b2):
+                caminoActual = self.extra.camino + tuple([Direction.Left])
+                yield self.add_decision(Direction.Left, Extra(newBrick, caminoActual))
 
         def solution(self):
             return self.extra.camino
@@ -54,10 +66,14 @@ def process(board: Board) -> Optional[Solution]:
             return self.extra.brick
 
         def score(self):
-            return self.extra.current_value
+            return len(self.extra.camino)
 
-    initial_ds = KnapsackDS(Extra(0, 0))
-    best_sol = list(bt_max_solve(initial_ds))[-1]
+    initial_ds = KnapsackDS(Extra(Brick(board.start_pos(), board.start_pos()), tuple([])))
+    lista = list(bt_min_solve(initial_ds))
+    longitud = len(lista)
+    if longitud == 0:
+        return None
+    best_sol = lista[-1]
     return best_sol
 
 
@@ -65,7 +81,7 @@ def show_results(solution: Optional[Solution]):
     if solution == None:
         print("INSTANCE WITHOUT SOLUTION")
     else:
-        directions2string(solution)
+        print(directions2string(solution))
 
 
 # Programa principal --------------------------------------------------------------------------------------------------

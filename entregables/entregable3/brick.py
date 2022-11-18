@@ -36,7 +36,70 @@ class Brick:
 
     # Funcion para mover el bloque, como el bloque es inmutable el 'move' devuelve otro bloque
     def move(self, d: Direction) -> Brick:
+        b1: RowCol = self.b1
+        b2: RowCol = self.b2
+        if self.b1.row == self.b2.row and self.b1.col == self.b2.col:  # estamos de pie
+            if d == Direction.Up:
+                b1 = RowCol(b1.row-2, b1.col)
+                b2 = RowCol(b2.row-1, b2.col)
+
+            elif d == Direction.Down:
+                b1 = RowCol(b1.row + 1, b1.col)
+                b2 = RowCol(b2.row + 2, b2.col)
+
+            elif d == Direction.Left:
+                b1 = RowCol(b1.row, b1.col - 2)
+                b2 = RowCol(b2.row, b2.col - 1)
+
+            elif d == Direction.Right:
+                b1 = RowCol(b1.row, b1.col + 1)
+                b2 = RowCol(b2.row, b2.col + 2)
+
+            else:
+                raise RuntimeError("Move: Invalid argument")
+
+        elif self.b1.row == self.b2.row and self.b1.col == self.b2.col - 1:  # estamos tumbados en una fila
+            if d == Direction.Up:
+                b1 = RowCol(b1.row - 1, b1.col)
+                b2 = RowCol(b2.row - 1, b2.col)
+
+            elif d == Direction.Down:
+                b1 = RowCol(b1.row + 1, b1.col)
+                b2 = RowCol(b2.row + 1, b2.col)
+
+            elif d == Direction.Left:
+                b1 = RowCol(b1.row, b1.col - 1)
+                b2 = RowCol(b2.row, b2.col -2)
+
+            elif d == Direction.Right:
+                b1 = RowCol(b1.row, b1.col + 2)
+                b2 = RowCol(b2.row , b2.col + 1)
+            else:
+                raise RuntimeError("Move: Invalid argument")
+
+        elif self.b1.row == self.b2.row - 1 and self.b1.col == self.b2.col:  # estamos tumbados en una columna
+            if d == Direction.Up:
+                b1 = RowCol(b1.row - 1, b1.col)
+                b2 = RowCol(b2.row - 2, b2.col)
+
+            elif d == Direction.Down:
+                b1 = RowCol(b1.row + 2, b1.col)
+                b2 = RowCol(b2.row + 1, b2.col)
+
+            elif d == Direction.Left:
+                b1 = RowCol(b1.row , b1.col-1)
+                b2 = RowCol(b2.row , b2.col-1)
+
+            elif d == Direction.Right:
+                b1 = RowCol(b1.row, b1.col +1)
+                b2 = RowCol(b2.row, b2.col+1)
+
+            else:
+                raise RuntimeError("Move: Invalid argument")
+        else:
+            raise RuntimeError("Move: imposible state reached")
+
+        return Brick(b1,b2)
         # TODO: IMPLEMENTAR
-        raise NotImplementedError()
 
     # IMPORTANTE: Puedes añadir métodos adicionales a la clase Brick
