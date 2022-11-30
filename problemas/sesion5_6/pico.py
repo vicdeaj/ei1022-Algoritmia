@@ -12,7 +12,7 @@ def show_results(pos_pic: int):
     print(pos_pic)
 
 
-def process(v:list[int]) -> int:
+def process_rec(v:list[int]) -> int:
     def tail_dec_solve(start: int, end:int) -> int:
         if end - start == 1: # is simple 1
             return start
@@ -28,6 +28,9 @@ def process(v:list[int]) -> int:
         return tail_dec_solve(start,end)
 
     return tail_dec_solve(0, len(v))
+
+
+process = process_rec
 
 if __name__ == "__main__":
     lista = read_data(sys.stdin)
