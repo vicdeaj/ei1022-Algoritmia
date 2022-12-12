@@ -27,6 +27,44 @@ def process_rec(v:list[int]) -> int:
         # recursividad
         return tail_dec_solve(start,end)
 
+    def div_solve(start: int, end: int) -> Solution:
+        # if problem.is_simple():
+        #     return problem.trivial_solution
+        # else:
+        #     subproblemas = problem.divide()
+        #     solutions = recursividad(...) for p in subproblemas
+        #     return problem.combine(solutions)
+        if end - start == 1:                    # is simple
+            return v[start], start, start + 1   # trivial sol
+        # divide
+        h = (start + end) // 2
+        # recursividad
+        best_left = div_solve(start, h)
+        best_right = div_solve(h, end)
+
+        acumulado_l = 0
+        i_max_l = h
+        v_max_l = v[h]
+        for i in range(h - 1, start - 1, - 1):
+            acumulado_l = acumulado_l + v[i]
+            if acumulado_l > v_max_l:
+                i_max_l = i
+                v_max_l = acumulado_l
+
+        acumulado_r = 0
+        i_max_r = h
+        v_max_r = v[h]
+        for i in range(h + 1, end):
+            acumulado_r = acumulado_r + v[i]
+            if acumulado_r > v_max_r:
+                i_max_r = i
+                v_max_r = acumulado_r
+
+        best_center = (v_max_l + v_max_r - v[h], i_max_l, i_max_r)
+        # combine & return
+        return max(best_left, best_right, best_center)
+
+    return div_solve(0, len(v))
     return tail_dec_solve(0, len(v))
 
 
