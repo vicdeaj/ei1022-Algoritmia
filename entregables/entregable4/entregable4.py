@@ -6,7 +6,11 @@ Solution = tuple[int, int, int]  # l, r, coste
 
 
 def read_data(f: TextIO) -> list[int]:
-    raise NotImplementedError("read_data")
+    res = []
+    for l in f:
+        res.append(int(l))
+
+    return res
 
 
 def process(v: list[int]) -> Solution:
@@ -14,7 +18,7 @@ def process(v: list[int]) -> Solution:
 
 
 def show_results(sol: Solution):
-    raise NotImplementedError("show_results")
+    print(sol[0], sol[1], sol[2])
 
 
 if __name__ == "__main__":
