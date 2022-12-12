@@ -54,7 +54,7 @@ def process(v: list[int]) -> Solution:
         indice_izq = medio - 1
         indice_drc = medio
 
-        lista_maximos = []
+        lista_maximos = [0]
 
         lado_actual = "izq"
         while indice_izq >= start or indice_drc < end:
@@ -64,7 +64,7 @@ def process(v: list[int]) -> Solution:
                     continue
                 # ir_izq
 
-                if v[indice_izq] > maximo_izq:
+                if v[indice_izq] > maximo_izq and maximo_izq <= maximo_drc:
                     lista_maximos.append(maximo_izq)
                     maximo_izq = v[indice_izq]
                     punta_izq = indice_izq
@@ -84,7 +84,7 @@ def process(v: list[int]) -> Solution:
                 # ir_drc
 
 
-                if v[indice_drc] > maximo_drc:
+                if v[indice_drc] > maximo_drc and maximo_drc <= maximo_izq:
                     lista_maximos.append(maximo_drc)
                     maximo_drc = v[indice_drc]
                     punta_drc = indice_drc
