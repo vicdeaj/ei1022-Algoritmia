@@ -68,9 +68,10 @@ def process(v: list[int]) -> Solution:
                     lista_maximos.append(maximo_izq)
                     maximo_izq = v[indice_izq]
                     punta_izq = indice_izq
-                    lado_actual = "drc"
                     acumulado_izq_maximo += acumulado_izq
                     acumulado_izq = 0
+                    if maximo_izq > maximo_drc:
+                        lado_actual = "drc"
 
 
                 acumulado_izq += v[indice_izq]
@@ -89,8 +90,9 @@ def process(v: list[int]) -> Solution:
                     maximo_drc = v[indice_drc]
                     punta_drc = indice_drc
                     acumulado_drc_maximo += acumulado_drc
+                    if maximo_drc > maximo_izq:
+                        lado_actual = "izq"
                     acumulado_drc = 0
-                    lado_actual = "izq"
 
                 acumulado_drc += v[indice_drc]
                 indice_drc += 1
