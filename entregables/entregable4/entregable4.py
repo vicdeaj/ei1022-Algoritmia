@@ -80,8 +80,7 @@ def process(v: list[int]) -> Solution:
 
             if lado_actual == "drc":
                 if indice_drc >= end: # skipeamos si ya hemos terminado este lado
-                    lado_actual = "izq"
-                    continue
+                    break
                 # ir_drc
 
 
