@@ -51,14 +51,10 @@ def process(v: list[int]) -> Solution:
         maximo_drc = 0
         punta_drc = -1
 
-        indice_izq = medio -1
+        indice_izq = medio - 1
         indice_drc = medio
 
-        candidato_d = -1
-        acumulado_candidato_d = 0
-        candidato_i = -1
-        acumulado_candidato_i = 0
-
+        lista_maximos = []
 
         lado_actual = "izq"
         while indice_izq >= start or indice_drc < end:
@@ -68,65 +64,37 @@ def process(v: list[int]) -> Solution:
                     continue
                 # ir_izq
 
-                if v[indice_izq] > maximo_izq and (maximo_izq < maximo_drc or maximo_drc == 0):
+                if v[indice_izq] > maximo_izq:
+                    lista_maximos.append(maximo_izq)
                     maximo_izq = v[indice_izq]
                     punta_izq = indice_izq
                     lado_actual = "drc"
                     acumulado_izq_maximo += acumulado_izq
                     acumulado_izq = 0
-                else:
-                    candidato_i = indice_izq
-                    acumulado_candidato_i = acumulado_izq
-                    lado_actual = "drc"
-
-                if v[candidato_d] <= v[candidato_i] and (candidato_d !=-1 and candidato_i !=-1) and v[candidato_i]>maximo_izq and v[candidato_d] > maximo_drc:
-                    maximo_izq = v[candidato_i]
-                    maximo_drc = v[candidato_d]
-                    punta_drc = candidato_d
-                    punta_izq = candidato_i
-                    acumulado_drc_maximo += acumulado_candidato_d
-                    acumulado_drc = acumulado_drc - acumulado_candidato_d
-                    acumulado_izq_maximo += acumulado_candidato_i
-                    acumulado_izq = acumulado_izq - acumulado_candidato_i
-                    candidato_d = 0
-                    acumulado_candidato_d = 0
-                    candidato_i = 0
-                    acumulado_candidato_i = 0
 
 
                 acumulado_izq += v[indice_izq]
                 indice_izq -= 1
+
+
             if lado_actual == "drc":
                 if indice_drc >= end: # skipeamos si ya hemos terminado este lado
                     lado_actual = "izq"
                     continue
                 # ir_drc
-                if v[indice_drc] > maximo_drc and (maximo_drc < maximo_izq or maximo_izq == 0):
+
+
+                if v[indice_drc] > maximo_drc:
+                    lista_maximos.append(maximo_drc)
                     maximo_drc = v[indice_drc]
                     punta_drc = indice_drc
                     acumulado_drc_maximo += acumulado_drc
                     acumulado_drc = 0
                     lado_actual = "izq"
-                else:
-                    candidato_d = indice_drc
-                    acumulado_candidato_d = acumulado_drc
-                    lado_actual = "izq"
+
                 acumulado_drc += v[indice_drc]
                 indice_drc += 1
 
-                if v[candidato_d] >= v[candidato_i] and (candidato_d !=-1 and candidato_i !=-1) and v[candidato_i]>maximo_izq and v[candidato_d] > maximo_drc:
-                    acumulado_drc_maximo += acumulado_candidato_d
-                    acumulado_drc = acumulado_drc - acumulado_candidato_d
-                    acumulado_izq_maximo += acumulado_candidato_i
-                    acumulado_izq = acumulado_izq - acumulado_candidato_i
-                    maximo_izq = v[candidato_i]
-                    maximo_drc = v[candidato_d]
-                    punta_drc = candidato_d
-                    punta_izq = candidato_i
-                    candidato_d = 0
-                    acumulado_candidato_d = 0
-                    candidato_i = 0
-                    acumulado_candidato_i = 0
 
 
 
