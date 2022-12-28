@@ -47,7 +47,11 @@ def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
 
     # Initialize the memoization dictionary
     memo = {}
-    return S(1, 1, 1) + T[0], [0]
+    aux = S(1, 1, 1)
+    lista_decisiones = aux[1]
+    lista_decisiones.sort()
+    lista_decisiones = [0] + lista_decisiones
+    return aux[0] + T[0], lista_decisiones
 
 
 
