@@ -14,36 +14,41 @@ def read_data(f: TextIO) -> tuple[int, int, list[Score]]:
 def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
     # IMPLEMENTAR
     def S(m, n, k) -> Score:
-        if n == len(T):
-            return puntuacion, caminito
-        if m < M and k < K:
-            anyadir = list(caminito)
-            anyadir.append(n)
-            anyadir_pto = puntuacion + T[n]
+        # Check if the result has already been calculated
+        if (m, n, k) in memo:
+            return memo[(m, n, k)]
 
-            opcion1 = S(m, n+1, k +1, puntuacion, caminito)
-            opcion2 = S(m+1, n+1, 1, anyadir_pto, anyadir)
+        if n == len(T):
+            return 0
+        if m < M and k < K:
+
+            opcion1 = S(m, n+1, k +1)
+            opcion2 = S(m+1, n+1, 1) + T[n]
 
             if opcion1 > opcion2:
-                return opcion1
+                result = opcion1
             else:
-                return opcion2
+                result = opcion2
 
            # return max(S(m, n+1, k +1, caminito), (S(m+1, n+1, 1, anyadir)[0] + T[n]))
 
-        if m < M and k == K:
-            caminito.append(n)
-            return S(m+1, n+1, 1, puntuacion + T[n], caminito)
+        elif m < M and k == K:
+            result = S(m+1, n+1, 1) + T[n]
 
+        elif m == M and k < K:
+            result = S(m, n+1, k+1)
 
-        if m == M and k < K:
-            return S(m, n+1, k+1, puntuacion, caminito)
+        elif k == K and m == M:
+            result = -infinity
 
+        # Store the result in the memoization dictionary
+        memo[(m, n, k)] = result
+        return result
 
-        if k == K and m == M:
-            return -infinity, caminito
+    # Initialize the memoization dictionary
+    memo = {}
+    return S(1, 1, 1) + T[0], [0]
 
-    return S(0, 1, 1, T[0], [0])
 
 
 def show_results(score: Score, decisions: list[Decision]):
