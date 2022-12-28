@@ -13,8 +13,7 @@ def read_data(f: TextIO) -> tuple[int, int, list[Score]]:
 
 def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
     # IMPLEMENTAR
-    def S(m, n, k, puntuacion: Score, caminito: list[Decision]) -> tuple[Score, list[Decision]]:
-        caminito = list(caminito)
+    def S(m, n, k) -> Score:
         if n == len(T):
             return puntuacion, caminito
         if m < M and k < K:
@@ -25,7 +24,7 @@ def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
             opcion1 = S(m, n+1, k +1, puntuacion, caminito)
             opcion2 = S(m+1, n+1, 1, anyadir_pto, anyadir)
 
-            if opcion1[0] > opcion2[0]:
+            if opcion1 > opcion2:
                 return opcion1
             else:
                 return opcion2
