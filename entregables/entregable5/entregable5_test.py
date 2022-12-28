@@ -108,7 +108,7 @@ def check_instance(filename) -> Result:
             print(f"  SCORE:    OK - {expected_score} points")
             print(f"  USEDTIME: OK - {elapsed_time:.2f} sec (<= {MAX_SECONDS} sec)")
             return Result.OK
-        elif score < expected_score:
+        elif score != expected_score:
             print(f"RESULT: {Result.ERROR_SOLUTION_LENGTH.name}")
             print(f"  SCORE:    ERROR - {score} points (< {expected_score})")
             if elapsed_time <= MAX_SECONDS:

@@ -10,7 +10,6 @@ def read_data(f: TextIO) -> tuple[int, int, list[Score]]:
     T = [int(line) for line in f]
     return K, M, T
 
-
 def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
     # IMPLEMENTAR
     raise NotImplementedError()
