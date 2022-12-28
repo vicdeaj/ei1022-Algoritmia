@@ -13,17 +13,18 @@ def read_data(f: TextIO) -> tuple[int, int, list[Score]]:
 
 def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
     # IMPLEMENTAR
-    def S(m, n, k) -> Score:
+    def S(m, n, k) -> tuple[Score, list[Decision]]:
         # Check if the result has already been calculated
         if (m, n, k) in memo:
             return memo[(m, n, k)]
 
         if n == len(T):
-            return 0
+            return 0, []
         if m < M and k < K:
 
             opcion1 = S(m, n+1, k +1)
-            opcion2 = S(m+1, n+1, 1) + T[n]
+            aux = S(m+1, n+1, 1)
+            opcion2 = aux[0] + T[n], list(aux[1]) + [n]
 
             if opcion1 > opcion2:
                 result = opcion1
@@ -33,13 +34,14 @@ def process(K: int, M: int, T: list[Score]) -> tuple[Score, list[Decision]]:
            # return max(S(m, n+1, k +1, caminito), (S(m+1, n+1, 1, anyadir)[0] + T[n]))
 
         elif m < M and k == K:
-            result = S(m+1, n+1, 1) + T[n]
+            aux = S(m+1, n+1, 1)
+            result = aux[0] + T[n], list(aux[1]) + [n]
 
         elif m == M and k < K:
             result = S(m, n+1, k+1)
 
         elif k == K and m == M:
-            result = -infinity
+            result = -infinity, []
 
         # Store the result in the memoization dictionary
         memo[(m, n, k)] = result
